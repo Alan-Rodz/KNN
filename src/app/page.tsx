@@ -35,7 +35,7 @@ const LandingPageComponent: React.FC = () => {
   const handleHover = (event: Readonly<PlotHoverEvent>) => {
     if (event.points.length > 0) {
       const pointIndex = event.points[0].pointIndex;
-      setHoverData(data[pointIndex]);
+      setHoverData(data.points[pointIndex]);
     } else {
       setHoverData(null);
     }
@@ -49,7 +49,7 @@ const LandingPageComponent: React.FC = () => {
         <Center flexDir='column' gap='1em'>
           <Text fontWeight='bold' width='fit-content'>Número de clusters:</Text>
           <Center gap='1em'>
-            <Button onClick={() => setClusterCount(Math.max(clusterCount - 1, 1))}>-</Button>
+            <Button onClick={() => setClusterCount(Math.max(clusterCount - 1, 2))}>-</Button>
             <Input isDisabled={true} type='number' value={clusterCount} width='5em' />
             <Button onClick={() => setClusterCount(clusterCount + 1)}>+</Button>
           </Center>
@@ -58,7 +58,7 @@ const LandingPageComponent: React.FC = () => {
         <Center flexDir='column' gap='1em'>
           <Text fontWeight='bold' width='fit-content'>Puntos por cluster:</Text>
           <Center gap='1em'>
-            <Button onClick={() => setPointsPerCluster(Math.max(pointsPerCluster - 1, 1))}>-</Button>
+            <Button onClick={() => setPointsPerCluster(Math.max(pointsPerCluster - 1, 2))}>-</Button>
             <Input isDisabled={true} type='number' value={pointsPerCluster} width='5em' />
             <Button onClick={() => setPointsPerCluster(pointsPerCluster + 1)}>+</Button>
           </Center>
@@ -89,17 +89,17 @@ const LandingPageComponent: React.FC = () => {
             con etiqueta: {hoverData.label}
           </div>
         )}
-      <div>Predicción en (3, 5): {knn(data, { x: 3, y: 5, label: 0 }, k)}</div>
+      <div>Predicción en (3, 5): {knn(data.points, { x: 3, y: 5, label: 0 }, k)}</div>
       <Plot
         data={[
           {
             type: 'scatter',
             mode: 'markers',
-            x: data.map((d) => d.x),
-            y: data.map((d) => d.y),
-            text: data.map((d) => d.label.toString()),
+            x: data.points.map((point) => point.x),
+            y: data.points.map((point) => point.y),
+            text: data.points.map((d) => d.label.toString()),
             marker: {
-              color: data.map((d) => (d.label === 0 ? 'blue' : 'red'))
+              color: data.points.map((point) => (data.labelColors[point.label]))
             },
             hoverinfo: 'text'
           }

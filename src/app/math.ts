@@ -2,18 +2,21 @@ import { DataPoint, HyperParams } from './type';
 
 // ********************************************************************************
 export const generateData = ({ clusterCount, pointsPerCluster, clusterRadius }: HyperParams) => {
-  const data: DataPoint[] = [];
+  const points: DataPoint[] = [];
+  const labels = Array.from({ length: clusterCount }, (_, i) => i);
+  const labelColors = labels.map((label) => `hsl(${(label * 360) / clusterCount}, 70%, 50%)`);
+
   for (let i = 0; i < clusterCount; i++) {
     const clusterX = Math.random() * 10;
     const clusterY = Math.random() * 10;
     for (let j = 0; j < pointsPerCluster; j++) {
       const x = clusterX + (Math.random() - 0.5) * clusterRadius;
       const y = clusterY + (Math.random() - 0.5) * clusterRadius;
-      const label = i;
-      data.push({ x, y, label });
+      const label = labels[i];
+      points.push({ x, y, label });
     }
   }
-  return data;
+  return { labels, labelColors, points }
 };
 
 export const computeEuclideanDistance = (p1: DataPoint, p2: DataPoint) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
