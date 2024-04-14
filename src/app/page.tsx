@@ -1,95 +1,102 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
 
-export default function Home() {
+import React, { useState } from 'react';
+import Plot from 'react-plotly.js';
+
+// ********************************************************************************
+interface DataPoint {
+  x: number;
+  y: number;
+  label: string;
+}
+
+const generateData = (count: number) => {
+  const data: DataPoint[] = [];
+  for (let i = 0; i < count; i++) {
+    const x = Math.random() * 10;
+    const y = Math.random() * 10;
+    const label = Math.random() > 0.5 ? "A" : "B";
+    data.push({ x, y, label });
+  }
+  return data;
+};
+
+const distance = (p1: DataPoint, p2: DataPoint) => {
+  return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+};
+
+const knn = (data: DataPoint[], point: DataPoint, k: number) => {
+  const distances = data.map((d) => ({
+    point: d,
+    distance: distance(point, d)
+  }));
+  distances.sort((a, b) => a.distance - b.distance);
+  const nearestNeighbors = distances.slice(0, k);
+  const counts = nearestNeighbors.reduce((acc, curr) => {
+    acc[curr.point.label] = (acc[curr.point.label] || 0) + 1;
+    return acc;
+  }, {} as { [key: string]: number });
+  return Object.keys(counts).reduce(
+    (prev, curr) => (counts[curr] > counts[prev] ? curr : prev),
+    Object.keys(counts)[0]
+  );
+};
+
+const LandingPageComponent: React.FC = () => {
+  const [data] = useState(() => generateData(50));
+  const [k, setK] = useState(3);
+  const [hoverData, setHoverData] = useState<DataPoint | null>(null);
+
+  const handleHover = (event: any) => {
+    if (event.points.length > 0) {
+      const pointIndex = event.points[0].pointIndex;
+      setHoverData(data[pointIndex]);
+    } else {
+      setHoverData(null);
+    }
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+    <div>
+      <h1>K-Nearest Neighbors</h1>
+      <div>
+        K:{" "}
+        <input
+          type="number"
+          value={k}
+          onChange={(e) => setK(parseInt(e.target.value))}
         />
       </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <Plot
+        data={[
+          {
+            type: "scatter",
+            mode: "markers",
+            x: data.map((d) => d.x),
+            y: data.map((d) => d.y),
+            text: data.map((d) => d.label),
+            marker: {
+              color: data.map((d) => (d.label === "A" ? "blue" : "red"))
+            },
+            hoverinfo: "text"
+          }
+        ]}
+        layout={{ width: 800, height: 600, title: "K-Nearest Neighbors" }}
+        onHover={handleHover}
+      />
+      {hoverData && (
+        <div>
+          Hovered Data Point: ({hoverData.x.toFixed(2)}, {hoverData.y.toFixed(2)}){" "}
+          with label: {hoverData.label}
+        </div>
+      )}
+      <div>
+        Prediction at (3, 5): {knn(data, { x: 3, y: 5, label: "" }, k)}
       </div>
-    </main>
+    </div>
   );
-}
+};
+
+
+// == Export ======================================================================
+export default LandingPageComponent;
