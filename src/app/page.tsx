@@ -1,51 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Plot from 'react-plotly.js';
 
+import { generateData, knn } from './math';
+import { DataPoint } from './type';
+
 // ********************************************************************************
-// == Type ========================================================================
-type DataPoint = {
-  x: number;
-  y: number;
-  label: number;
-}
-
 // == Constant ====================================================================
-const generateData = (
-  clusterCount: number,
-  pointsPerCluster: number,
-  clusterRadius: number
-) => {
-  const data: DataPoint[] = [];
-  for (let i = 0; i < clusterCount; i++) {
-    const clusterX = Math.random() * 10;
-    const clusterY = Math.random() * 10;
-    for (let j = 0; j < pointsPerCluster; j++) {
-      const x = clusterX + (Math.random() - 0.5) * clusterRadius;
-      const y = clusterY + (Math.random() - 0.5) * clusterRadius;
-      const label = i;
-      data.push({ x, y, label });
-    }
-  }
-  return data;
-};
-
-
-const computeEuclideanDistance = (p1: DataPoint, p2: DataPoint) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
-
-const knn = (data: DataPoint[], point: DataPoint, k: number) => {
-  const distances = data.map((d) => ({ point: d, distance: computeEuclideanDistance(point, d) }));
-  distances.sort((a, b) => a.distance - b.distance);
-  const nearestNeighbors = distances.slice(0, k);
-
-  const counts = nearestNeighbors.reduce((acc, curr) => {
-    acc[curr.point.label] = (acc[curr.point.label] || 0) + 1;
-    return acc;
-  }, {} as { [key: string]: number });
-
-  return Object.keys(counts).reduce((prev, curr) => (counts[curr] > counts[prev] ? curr : prev), Object.keys(counts)[0]);
-};
 
 // == Component ===================================================================
 const LandingPageComponent: React.FC = () => {
