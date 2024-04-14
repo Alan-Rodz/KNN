@@ -1,5 +1,6 @@
 'use client';
 
+import { Button, Center, Flex, Heading, Input, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 import Plot from 'react-plotly.js';
 
@@ -26,10 +27,23 @@ const LandingPageComponent: React.FC = () => {
 
   // -- UI ------------------------------------------------------------------------
   return (
-    <div>
-      <h1>K-Nearest Neighbors</h1>
-      <div>K: {' '} <input onChange={(e) => setK(parseInt(e.target.value))} type='number' value={k} />
-      </div>
+    <Center flexDir='column' gap='1em' paddingY='3em'>
+      <Text fontSize='2em' fontWeight='bold'>K-Nearest Neighbors</Text>
+      <Text fontSize='1em' fontWeight='bold'>Equipo 1</Text>
+      <Center gap='1em'>
+        <Text width='fit-content'>Valor de K:</Text>
+        <Button>-</Button>
+        <Input isDisabled={true} type='number' value={k} />
+        <Button>+</Button>
+      </Center>
+      {
+        hoverData && (
+          <div>
+            Punto seleccionado con el mouse: ({hoverData.x.toFixed(2)}, {hoverData.y.toFixed(2)}){' '}
+            con etiqueta: {hoverData.label}
+          </div>
+        )}
+      <div>Predicción en (3, 5): {knn(data, { x: 3, y: 5, label: 0 }, k)}</div>
       <Plot
         data={[
           {
@@ -44,19 +58,11 @@ const LandingPageComponent: React.FC = () => {
             hoverinfo: 'text'
           }
         ]}
-        layout={{ width: 800, height: 600, title: 'K-Nearest Neighbors' }}
+        layout={{ width: 600, height: 400 }}
+        style={{ border: '1px solid black', borderRadius: '16px', padding: '1em' }}
         onHover={handleHover}
       />
-      {
-        hoverData && (
-          <div>
-            Hovered Data Point: ({hoverData.x.toFixed(2)}, {hoverData.y.toFixed(2)}){' '}
-            with label: {hoverData.label}
-          </div>
-        )}
-
-      <div> Prediction at (3, 5): {knn(data, { x: 3, y: 5, label: 0 }, k)}</div>
-    </div>
+    </Center>
   );
 };
 
