@@ -21,8 +21,8 @@ export const generateData = ({ clusterCount, pointsPerCluster, clusterRadius }: 
 
 export const computeEuclideanDistance = (p1: DataPoint, p2: DataPoint) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
 
-export const knn = (data: DataPoint[], point: DataPoint, k: number) => {
-  const distances = data.map((d) => ({ point: d, distance: computeEuclideanDistance(point, d) }));
+export const knn = (points: DataPoint[], classifiedPoint: DataPoint, k: number) => {
+  const distances = points.map((d) => ({ point: d, distance: computeEuclideanDistance(classifiedPoint, d) }));
   distances.sort((a, b) => a.distance - b.distance);
   const nearestNeighbors = distances.slice(0, k);
 

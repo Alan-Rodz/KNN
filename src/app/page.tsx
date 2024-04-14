@@ -16,20 +16,14 @@ const LandingPageComponent: React.FC = () => {
   const [pointsPerCluster, setPointsPerCluster] = useState(20);
   const [clusterRadius, setClusterRadius] = useState(1.5);
   const [k, setK] = useState(3);
-
-  const [params, setParams] = useState<HyperParams>({ clusterCount, pointsPerCluster, clusterRadius });
-  const [data, setData] = useState(() => generateData(params));
+  const [data, setData] = useState(() => generateData({ clusterCount, pointsPerCluster, clusterRadius }));
 
   const [hoverData, setHoverData] = useState<DataPoint | null>(null);
 
   // -- Effect --------------------------------------------------------------------
   useEffect(() => {
-    setParams({ clusterCount, pointsPerCluster, clusterRadius });
+    setData(generateData({ clusterCount, pointsPerCluster, clusterRadius }));
   }, [clusterCount, pointsPerCluster, clusterRadius]);
-
-  useEffect(() => {
-    setData(generateData(params));
-  }, [params]);
 
   // -- Handler -------------------------------------------------------------------
   const handleHover = (event: Readonly<PlotHoverEvent>) => {
