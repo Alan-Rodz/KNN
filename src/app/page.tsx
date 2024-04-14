@@ -1,22 +1,38 @@
 'use client';
 
 import { Button, Center, Input, Text } from '@chakra-ui/react';
-import { useState } from 'react';
+import { PlotHoverEvent } from 'plotly.js';
+import { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
 
 import { generateData, knn } from './math';
-import { DataPoint } from './type';
+import { DataPoint, HyperParams } from './type';
 
 // ********************************************************************************
 // == Component ===================================================================
 const LandingPageComponent: React.FC = () => {
   // -- State ---------------------------------------------------------------------
+  const [clusterCount, setClusterCount] = useState(2);
+  const [pointsPerCluster, setPointsPerCluster] = useState(20);
+  const [clusterRadius, setClusterRadius] = useState(1.5);
   const [k, setK] = useState(3);
-  const [data] = useState(() => generateData(2, 20, 1.5));
+
+  const [params, setParams] = useState<HyperParams>({ clusterCount, pointsPerCluster, clusterRadius });
+  const [data, setData] = useState(() => generateData(params));
+
   const [hoverData, setHoverData] = useState<DataPoint | null>(null);
 
+  // -- Effect --------------------------------------------------------------------
+  useEffect(() => {
+    setParams({ clusterCount, pointsPerCluster, clusterRadius });
+  }, [clusterCount, pointsPerCluster, clusterRadius]);
+
+  useEffect(() => {
+    setData(generateData(params));
+  }, [params]);
+
   // -- Handler -------------------------------------------------------------------
-  const handleHover = (event: any) => {
+  const handleHover = (event: Readonly<PlotHoverEvent>) => {
     if (event.points.length > 0) {
       const pointIndex = event.points[0].pointIndex;
       setHoverData(data[pointIndex]);
@@ -29,13 +45,43 @@ const LandingPageComponent: React.FC = () => {
   return (
     <Center flexDir='column' gap='1em' paddingY='3em'>
       <Text fontSize='2em' fontWeight='bold'>K-Nearest Neighbors</Text>
-      <Text fontSize='1em' fontWeight='bold'>Equipo 1</Text>
-      <Center gap='1em'>
-        <Text width='fit-content'>Valor de K:</Text>
-        <Button>-</Button>
-        <Input isDisabled={true} type='number' value={k} />
-        <Button>+</Button>
+      <Center gap='3em'>
+        <Center flexDir='column' gap='1em'>
+          <Text fontWeight='bold' width='fit-content'>Número de clusters:</Text>
+          <Center gap='1em'>
+            <Button onClick={() => setClusterCount(Math.max(clusterCount - 1, 1))}>-</Button>
+            <Input isDisabled={true} type='number' value={clusterCount} width='5em' />
+            <Button onClick={() => setClusterCount(clusterCount + 1)}>+</Button>
+          </Center>
+        </Center>
+
+        <Center flexDir='column' gap='1em'>
+          <Text fontWeight='bold' width='fit-content'>Puntos por cluster:</Text>
+          <Center gap='1em'>
+            <Button onClick={() => setPointsPerCluster(Math.max(pointsPerCluster - 1, 1))}>-</Button>
+            <Input isDisabled={true} type='number' value={pointsPerCluster} width='5em' />
+            <Button onClick={() => setPointsPerCluster(pointsPerCluster + 1)}>+</Button>
+          </Center>
+        </Center>
+
+        <Center flexDir='column' gap='1em'>
+          <Text fontWeight='bold' width='fit-content'>Radio del cluster:</Text>
+
+          <Center gap='1em'>
+            <Button onClick={() => setClusterRadius(Math.max(clusterRadius - 0.1, 0.1))}>-</Button>
+            <Input isDisabled={true} type='number' value={clusterRadius} width='5em' />
+            <Button onClick={() => setClusterRadius(clusterRadius + 0.1)}>+</Button>
+          </Center>
+        </Center>
       </Center>
+
+      <Center gap='1em'>
+        <Text fontWeight='bold' width='fit-content'>Valor de K:</Text>
+        <Button onClick={() => setK(Math.max(k - 1, 1))}>-</Button>
+        <Input isDisabled={true} type='number' value={k} width='5em' />
+        <Button onClick={() => setK(k + 1)}>+</Button>
+      </Center>
+
       {
         hoverData && (
           <div>
@@ -59,7 +105,7 @@ const LandingPageComponent: React.FC = () => {
           }
         ]}
         layout={{ width: 600, height: 400 }}
-        style={{ border: '1px solid black', borderRadius: '16px', padding: '1em' }}
+        style={{ border: '1px solid black', borderRadius: '16px', padding: '2em' }}
         onHover={handleHover}
       />
     </Center>

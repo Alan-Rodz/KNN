@@ -1,11 +1,7 @@
-import { DataPoint } from './type';
+import { DataPoint, HyperParams } from './type';
 
 // ********************************************************************************
-export const generateData = (
-  clusterCount: number,
-  pointsPerCluster: number,
-  clusterRadius: number
-) => {
+export const generateData = ({ clusterCount, pointsPerCluster, clusterRadius }: HyperParams) => {
   const data: DataPoint[] = [];
   for (let i = 0; i < clusterCount; i++) {
     const clusterX = Math.random() * 10;

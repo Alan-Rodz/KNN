@@ -4,3 +4,5 @@ export type DataPoint = {
   y: number;
   label: number;
 }
+
+export type HyperParams = { clusterCount: number; pointsPerCluster: number; clusterRadius: number };
