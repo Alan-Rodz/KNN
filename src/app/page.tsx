@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Center, Flex, Heading, Input, Text } from '@chakra-ui/react';
+import { Button, Center, Input, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 import Plot from 'react-plotly.js';
 
