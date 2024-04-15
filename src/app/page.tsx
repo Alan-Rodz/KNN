@@ -35,7 +35,7 @@ const LandingPageComponent: React.FC = () => {
 
   const [mode, setMode] = useState<'classification' | 'regression'>('classification');
 
-  const [clickedPoint, setClickedPoint] = useState<DataPoint>({ label: 0, x: 0, y: 0 });
+  const [clickedPoint, setClickedPoint] = useState<DataPoint | null>(null);
 
   // -- Effect --------------------------------------------------------------------
   useEffect(() => {
@@ -73,20 +73,25 @@ const LandingPageComponent: React.FC = () => {
       data: data.points.filter((point) => point.label === label).map((point) => ({ x: point.x, y: point.y })),
       label: `Cluster ${label}`,
     })),
-    {
-      backgroundColor: data.labelColors[clickedPoint.label],
-      borderColor: data.labelColors[clickedPoint.label],
-      borderWidth: 1,
-      data: [clickedPoint],
-      label: 'Punto clasificado',
-    }]
+
+    ...clickedPoint
+      ? [
+        {
+          backgroundColor: data.labelColors[clickedPoint.label],
+          borderColor: data.labelColors[clickedPoint.label],
+          borderWidth: 1,
+          data: [clickedPoint],
+          label: 'Punto clasificado',
+        }]
+      : []
+    ]
   };
   return (
     <Center flexDir='column' gap='1em' paddingY='3em'>
       <Text fontSize='2em' fontWeight='bold'>K-Nearest Neighbors</Text>
-      <Center>
-        <Button onClick={() => setMode('classification')}>Clasificación</Button>
-        <Button onClick={() => setMode('regression')}>Regresión</Button>
+      <Center gap='1em'>
+        <Button isActive={mode === 'classification'} onClick={() => setMode('classification')}>Clasificación</Button>
+        <Button isActive={mode === 'regression'} onClick={() => setMode('regression')}>Regresión</Button>
       </Center>
       <Center flexDir={isMdOrBigger ? 'row' : 'column'} gap='3em'>
         <Center flexDir='column' gap='1em'>
