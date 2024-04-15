@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Button, Center, Input, Text } from '@chakra-ui/react';
-import { BarController, BarElement, CategoryScale, ChartData, Chart as ChartJS, Legend, LineController, LineElement, LinearScale, PointElement, Tooltip } from 'chart.js';
+import { BarController, BarElement, CategoryScale, ChartData, Chart as ChartJS, Legend, LineController, LineElement, LinearScale, PointElement, ScatterController, Tooltip } from 'chart.js';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Chart } from 'react-chartjs-2';
 
@@ -10,7 +10,7 @@ import { DataPoint } from './type';
 
 // ********************************************************************************
 // == Constant ====================================================================
-ChartJS.register(BarController, BarElement, CategoryScale, Legend, LineController, LinearScale, LineElement, PointElement, Tooltip);
+ChartJS.register(BarController, BarElement, CategoryScale, Legend, LineController, LinearScale, LineElement, PointElement, ScatterController, Tooltip);
 
 const MAX_CLUSTER_COUNT = 10;
 const MIN_CLUSTER_COUNT = 2;
