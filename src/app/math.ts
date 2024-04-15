@@ -38,10 +38,18 @@ export const classifyUsingKNN = (points: DataPoint[], classifiedPoint: DataPoint
   }, {} as { [key: string]: number });
 
   const keys = Object.keys(labelCounts);
-  return keys.reduce((acc, currentIdx) =>
+  return Number(keys.reduce((acc, currentIdx) =>
   (
     labelCounts[currentIdx] > labelCounts[acc]
       ? currentIdx
       : acc
-  ), keys[0]);
+  ), keys[0]));
+};
+
+export const regressionUsingKNN = (points: DataPoint[], classifiedPoint: DataPoint, nearestNeighborAmount: number) => {
+  const distances = points.map((d) => ({ point: d, distance: computeEuclideanDistance(classifiedPoint, d) }));
+  const sortedDistances = [ ...distances.sort((a, b) => a.distance - b.distance) ];
+  const nearestNeighbors = sortedDistances.slice(0, nearestNeighborAmount);
+
+  return Math.floor(nearestNeighbors.reduce((acc, curr) => (acc + curr.point.label), 0) / nearestNeighborAmount);
 };

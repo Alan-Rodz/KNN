@@ -5,7 +5,7 @@ import { BarController, BarElement, CategoryScale, ChartData, Chart as ChartJS, 
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Chart } from 'react-chartjs-2';
 
-import { classifyUsingKNN, generateData } from './math';
+import { classifyUsingKNN, generateData, regressionUsingKNN } from './math';
 import { DataPoint } from './type';
 import { useIsMdOrBigger } from './useIsMdOrBigger';
 
@@ -32,6 +32,8 @@ const LandingPageComponent: React.FC = () => {
   const [clusterRadius, setClusterRadius] = useState(1.5);
   const [k, setK] = useState(3);
   const [data, setData] = useState(() => generateData({ clusterCount, pointsPerCluster, clusterRadius }));
+
+  const [mode, setMode] = useState<'classification' | 'regression'>('classification');
 
   const [clickedPoint, setClickedPoint] = useState<DataPoint>({ label: 0, x: 0, y: 0 });
 
@@ -82,6 +84,10 @@ const LandingPageComponent: React.FC = () => {
   return (
     <Center flexDir='column' gap='1em' paddingY='3em'>
       <Text fontSize='2em' fontWeight='bold'>K-Nearest Neighbors</Text>
+      <Center>
+        <Button onClick={() => setMode('classification')}>Clasificación</Button>
+        <Button onClick={() => setMode('regression')}>Regresión</Button>
+      </Center>
       <Center flexDir={isMdOrBigger ? 'row' : 'column'} gap='3em'>
         <Center flexDir='column' gap='1em'>
           <Text fontWeight='bold' width='fit-content'>Número de clusters:</Text>
@@ -128,7 +134,9 @@ const LandingPageComponent: React.FC = () => {
               const dataY = chart.scales.y.getValueForPixel(event.y ?? 0);
               if (!dataX || !dataY) return/*cannot continue*/;
 
-              const label = Number(classifyUsingKNN(data.points, { label: 0, x: dataX, y: dataY }, k));
+              const label = mode === 'classification'
+                ? classifyUsingKNN(data.points, { label: 0, x: dataX, y: dataY }, k)
+                : regressionUsingKNN(data.points, { label: 0, x: dataX, y: dataY }, k);
               setClickedPoint({ label, x: dataX, y: dataY });
             }
           }}
