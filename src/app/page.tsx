@@ -7,6 +7,7 @@ import { Chart } from 'react-chartjs-2';
 
 import { classifyUsingKNN, generateData } from './math';
 import { DataPoint } from './type';
+import { useIsMdOrBigger } from './useIsMdOrBigger';
 
 // ********************************************************************************
 // == Constant ====================================================================
@@ -23,6 +24,8 @@ const MIN_CLUSTER_RADIUS = 0.1;
 
 // == Component ===================================================================
 const LandingPageComponent: React.FC = () => {
+  const isMdOrBigger = useIsMdOrBigger();
+
   // -- State ---------------------------------------------------------------------
   const [clusterCount, setClusterCount] = useState(2);
   const [pointsPerCluster, setPointsPerCluster] = useState(20);
@@ -79,7 +82,7 @@ const LandingPageComponent: React.FC = () => {
   return (
     <Center flexDir='column' gap='1em' paddingY='3em'>
       <Text fontSize='2em' fontWeight='bold'>K-Nearest Neighbors</Text>
-      <Center gap='3em'>
+      <Center flexDir={isMdOrBigger ? 'row' : 'column'} gap='3em'>
         <Center flexDir='column' gap='1em'>
           <Text fontWeight='bold' width='fit-content'>Número de clusters:</Text>
           <Center gap='1em'>
@@ -112,15 +115,13 @@ const LandingPageComponent: React.FC = () => {
       <Center gap='1em'>
         <Text fontWeight='bold' width='fit-content'>Valor de K:</Text>
         <Button onClick={() => setK(Math.max(k - 1, 1))}>-</Button>
-        <Input onChange={(e) => setK(Math.max(k-1, Number(e.target.value)))} type='number' value={k} width='5em' />
+        <Input onChange={(e) => setK(Math.max(k - 1, Number(e.target.value)))} type='number' value={k} width='5em' />
         <Button onClick={() => setK(k + 1)}>+</Button>
       </Center>
 
-      <Box height='500px' width='600px'>
+      <Box height={isMdOrBigger ? '450px' : '350px'} width={isMdOrBigger ? '500px' : '300px'}>
         <Chart
           data={shownData}
-          height={400}
-          width={400}
           options={{
             onClick: (event, elements, chart) => {
               const dataX = chart.scales.x.getValueForPixel(event.x ?? 0);
