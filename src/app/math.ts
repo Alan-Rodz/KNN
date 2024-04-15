@@ -29,7 +29,8 @@ export const computeEuclideanDistance = (p1: DataPoint, p2: DataPoint) => Math.s
 // == KNN =========================================================================
 export const classifyUsingKNN = (points: DataPoint[], classifiedPoint: DataPoint, nearestNeighborAmount: number) => {
   const distances = points.map((d) => ({ point: d, distance: computeEuclideanDistance(classifiedPoint, d) }));
-  const sortedDistances = { ...distances.sort((a, b) => a.distance - b.distance) };
+  const sortedDistances = [ ...distances.sort((a, b) => a.distance - b.distance) ];
+  console.log(sortedDistances)
   const nearestNeighbors = sortedDistances.slice(0, nearestNeighborAmount);
 
   const labelCounts = nearestNeighbors.reduce((acc, curr) => {

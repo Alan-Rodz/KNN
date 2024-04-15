@@ -5,7 +5,8 @@ import { BarController, BarElement, CategoryScale, ChartData, Chart as ChartJS, 
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Chart } from 'react-chartjs-2';
 
-import { generateData } from './math';
+import { classifyUsingKNN, generateData } from './math';
+import { DataPoint } from './type';
 
 // ********************************************************************************
 // == Constant ====================================================================
@@ -28,6 +29,8 @@ const LandingPageComponent: React.FC = () => {
   const [clusterRadius, setClusterRadius] = useState(1.5);
   const [k, setK] = useState(3);
   const [data, setData] = useState(() => generateData({ clusterCount, pointsPerCluster, clusterRadius }));
+
+  const [clickedPoint, setClickedPoint] = useState<DataPoint>({ label: 0, x: 0, y: 0 });
 
   // -- Effect --------------------------------------------------------------------
   useEffect(() => {
@@ -58,13 +61,20 @@ const LandingPageComponent: React.FC = () => {
 
   // -- UI ------------------------------------------------------------------------
   const shownData: ChartData = {
-    datasets: data.labels.map((label, idx) => ({
+    datasets: [...data.labels.map((label, idx) => ({
       backgroundColor: data.labelColors[idx],
       borderColor: data.labelColors[idx],
       borderWidth: 1,
       data: data.points.filter((point) => point.label === label).map((point) => ({ x: point.x, y: point.y })),
       label: `Cluster ${label}`,
-    }))
+    })),
+    {
+      backgroundColor: data.labelColors[clickedPoint.label],
+      borderColor: data.labelColors[clickedPoint.label],
+      borderWidth: 1,
+      data: [clickedPoint],
+      label: 'Punto clasificado',
+    }]
   };
   return (
     <Center flexDir='column' gap='1em' paddingY='3em'>
@@ -102,7 +112,7 @@ const LandingPageComponent: React.FC = () => {
       <Center gap='1em'>
         <Text fontWeight='bold' width='fit-content'>Valor de K:</Text>
         <Button onClick={() => setK(Math.max(k - 1, 1))}>-</Button>
-        <Input type='number' value={k} width='5em' />
+        <Input onChange={(e) => setK(Math.max(k-1, Number(e.target.value)))} type='number' value={k} width='5em' />
         <Button onClick={() => setK(k + 1)}>+</Button>
       </Center>
 
@@ -111,6 +121,16 @@ const LandingPageComponent: React.FC = () => {
           data={shownData}
           height={400}
           width={400}
+          options={{
+            onClick: (event, elements, chart) => {
+              const dataX = chart.scales.x.getValueForPixel(event.x ?? 0);
+              const dataY = chart.scales.y.getValueForPixel(event.y ?? 0);
+              if (!dataX || !dataY) return/*cannot continue*/;
+
+              const label = Number(classifyUsingKNN(data.points, { label: 0, x: dataX, y: dataY }, k));
+              setClickedPoint({ label, x: dataX, y: dataY });
+            }
+          }}
           type='scatter'
         />
       </Box>
